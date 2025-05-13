@@ -1,105 +1,216 @@
-# Git 요약 정리
+# Git Cheat Sheet
 
-## 기본 명령어
+## 작업 영역 및 기본 명령어
 
-- 작업 영역 지정: `git init`
-- 변경사항 감지: `git status`
-- HEAD 내용 확인: `git log`
-- 인덱스에 저장: `git add .`
-- HEAD(저장소)에 저장: `git commit " "`
+- **작업 영역 지정**: `git init`
+- **변경사항 감지**: `git status`
+- **HEAD 내용 확인**: `git log`
+- **인덱스에 저장**: `git add .`
+- **HEAD(저장소)에 저장**: `git commit " "`
 
 ## Reset
 
-- `git reset --soft <해시>`: 커밋만 되돌림
-- `git reset --mixed <해시>`: 커밋과 스테이징 되돌림
-- `git reset --hard <해시>`: 커밋, 스테이징, 작업 파일 모두 되돌림
-- `git reflog` 후 `git reset --hard <reflog 해시>`: 과거 작업 상태로 이동
+- **reset 방법**:
+  ```bash
+  git reset --soft <해시값 앞 4~5자리>
+  git reset --mixed <해시값 앞 4~5자리>
+  git reset --hard <해시값 앞 4~5자리>
+  ```
+
+- **reflog 방법**:
+  ```bash
+  git reflog
+  git reset --hard <reflog 해시값>
+  ```
 
 ## Commit 수정
 
-- 메시지만 변경: `git commit --amend -m "새 메시지"`
-- 내용도 변경: `git commit --amend`
+- **커밋 메시지만 변경**:
+  ```bash
+  git commit --amend -m "새 메시지"
+  ```
+
+- **커밋 내용 변경 가능**:
+  ```bash
+  git commit --amend
+  ```
 
 ## 브랜치
 
-- 생성: `git branch <name>`
-- 변경: `git checkout <name>`
-- 생성 + 변경: `git checkout -b <name>`
-- 내용 추가: `touch xxx.확장자`
+- **branch 생성**: `git branch <name>`
+- **branch 변경**: `git checkout <name>`
+- **branch 생성 + 변경**: `git checkout -b <name>`
+- **branch에 내용 추가**: `touch <filename>`
 
 ## Merge
 
-- Fast-forward: `git checkout master` → `git merge topic`
-- Three-way: 충돌 발생 시 수동 해결 후 `git add`, `git commit`
-- Merge 로그 남기기: `git merge --no-ff 브랜치명`
-- Octopus Merge: `git merge branch1 branch2` (3개 이상 병합)
-- 충돌 해결: 충돌된 파일 수정 → `git add`, `git commit`
+- **Fast-forward merge**:
+  ```bash
+  git checkout master
+  git merge topic
+  ```
+
+- **Three-way merge**:
+  ```bash
+  git merge topic
+  # ESC -> :wq 저장 후 종료 / :q 종료
+  ```
+
+- **Merge 충돌 해결**: 충돌 파일 수정 후 `git add` + `git commit`
 
 ## Rebase
 
-- 기본: `git rebase -i HEAD~N`
-  - `pick`: 그대로 유지
-  - `reword`: 메시지 수정
-  - `edit`: 커밋 수정
-  - `squash`: 이전 커밋과 병합
-  - `drop`: 제거
-- continue: `git rebase --continue`
-- abort: `git rebase --abort`
-- 다른 브랜치 히스토리 합치기: `git rebase origin/master`, 이후 `git cherry-pick <커밋ID>`로 보존 커밋 복원
+- **특정 파일 제거**:
+  ```bash
+  git rebase -i HEAD~<갯수>
+  # pick → d 변경
+  ```
+
+- **이름 변경**:
+  ```bash
+  git rebase -i HEAD~<갯수>
+  # pick → r 변경 → 이름 수정
+  ```
+
+- **히스토리 병합**:
+  ```bash
+  git rebase -i HEAD~<갯수>
+  # pick → s 변경 → 메시지 통합
+  ```
+
+- **서로 다른 브랜치 히스토리 병합**:
+  ```bash
+  git rebase origin/master
+  git cherry-pick <커밋 ID>
+  ```
 
 ## 원격 저장소
 
-- 추가: `git remote add origin <주소>`
-- 확인: `git remote -v`, `git ls-remote`
-- 연결 취소: `git remote rm origin`
-- 다운로드: `git fetch origin master`
-- 병합 포함 다운로드: `git pull origin master`
-- 초기화 + 연결 + pull: `git clone <주소>`
+- **원격 저장소 추가**: `git remote add origin <url>`
+- **추가 확인**: `git remote -v` / `git ls-remote`
+- **원격 푸시**: `git push origin master`
+- **원격 저장소 삭제**: `git remote rm origin`
+- **원격 내용 다운로드**: `git fetch origin master`
+- **다운로드 + 병합**: `git pull origin master`
+- **init + remote + pull**: `git clone <url>`
 
-## Push
+## 원격 저장소 브랜치 관리
 
-1. 브랜치명이 같은 경우: `git push origin <브랜치명>`
-2. 추적 브랜치 설정 시: `git push`, `git pull`만으로도 가능
-3. 브랜치명이 다를 경우: `git push origin 로컬:원격`
+- **미완 작업 다른 브랜치로 푸시**:
+  ```bash
+  git branch <new_branch>
+  # 내용 추가 후 push
+  ```
 
-## 추적 브랜치 설정
+- **연결되지 않은 원격 브랜치 가져오기**:
+  ```bash
+  git fetch origin
+  git checkout -b <local_branch> origin/<remote_branch>
+  # 또는
+  git checkout -b <local_branch>
+  git pull origin <remote_branch>
+  ```
 
-1. `git checkout -b 로컬브랜치 origin/원격브랜치`
-2. `git branch --set-upstream-to=origin/원격브랜치 로컬브랜치`
-3. `git branch -u origin/원격브랜치 로컬브랜치`
-4. `git push -u origin 로컬브랜치:원격브랜치`
+- **병합 (Squash Merge)**:
+  ```bash
+  git checkout master
+  git merge --squash --topic
+  git commit ""
+  ```
 
-## 브랜치 병합
+- **Fast-forward Merge 로그 남기기**: `git merge --no-ff <branch>`
+- **원격 브랜치 삭제**: `git push --delete origin <branch>`
+- **강제 푸시**: `git push -f origin <branch>`
 
-- Fast-forward: 변경 사항이 한 쪽 브랜치에만 있는 경우
-- Three-way: 양쪽에 변경 사항이 있는 경우
-- Squash: 커밋 여러 개를 하나로 합쳐 병합 → `git merge --squash <브랜치>`
-- Rebase: 브랜치 위에 커밋을 재배치해 히스토리를 직선으로 정리
-  - `git rebase <브랜치>`
-  - `git rebase --continue`
-  - `git rebase --abort`
+## Git 명령 요약
+
+- **git clone**: 원격 저장소를 로컬로 복사
+- **git remote**: 원격 저장소 연결
+- **git fetch**: 원격 저장소 상태 동기화 (자동 병합 없음)
+- **git fetch origin <remote_branch>:<local_branch>**: 로컬 브랜치 강제 덮어쓰기 가능 (위험)
+- **git pull --rebase origin main**: rebase로 병합
+- **git log --graph --oneline --all**: 브랜치 공통 조상 확인
+- **git merge branch1 branch2 --strategy=ours**: 현재 브랜치 우선 병합
+- **git push origin --delete <branch>**: 원격 브랜치 삭제
+- **git branch -d <branch>**: 로컬 브랜치 삭제
+
+## Push / Pull 요약
+
+1. **로컬 & 원격 브랜치 명 동일**:
+   ```bash
+   git push origin <branch>
+   git pull origin <branch>
+   ```
+2. **추적 브랜치 설정된 경우**:
+   ```bash
+   git push
+   git pull
+   ```
+3. **브랜치명이 다르고 추적 브랜치 없음**:
+   ```bash
+   git push origin <local>:<remote>
+   git pull origin <remote>
+   ```
 
 ## 커밋 되돌리기
 
-- `git reset --hard HEAD~N`: 커밋, 스테이징, 작업 파일 삭제
-- `git reset --mixed HEAD~N`: 커밋, 스테이징 삭제, 작업 파일 유지
-- `git reset --soft HEAD~N`: 커밋만 삭제
-- `git revert <해시>`: 푸시된 커밋을 되돌리는 새 커밋 생성
+- **reset (히스토리 변경)**:
+  ```bash
+  git reset --hard HEAD~N
+  git reset --mixed HEAD~N
+  git reset --soft HEAD~N
+  ```
 
-## cherry-pick
+- **reflog 기준**:
+  ```bash
+  git reset --hard HEAD@{N}
+  ```
 
-- 커밋 복사 및 적용: `git cherry-pick <해시1> <해시2>`
+- **revert (푸시 후에도 가능)**:
+  ```bash
+  git revert <커밋 해시>
+  git revert A^..C
+  git revert -n A^..C
+  ```
 
-## 브랜치 삭제
+- **checkout 커밋 해시**: 특정 시점으로 HEAD만 이동
 
-- 로컬 브랜치 삭제: `git branch -d 브랜치명`
-- 원격 브랜치 삭제: `git push origin --delete 브랜치명`
+## 병합 종류
 
-## 기타
+- **Fast-forward Merge**: 현재 브랜치에만 커밋이 있을 때
+- **Three-way Merge**: 양쪽 브랜치가 변경된 경우 (충돌 가능)
+- **Octopus Merge**: 3개 이상 브랜치 병합 (충돌 발생 쉬움)
+- **Rebase**: 히스토리를 깔끔하게 정리 (주의 필요)
+  ```bash
+  git rebase --continue
+  git rebase --abort
+  ```
 
-- 브랜치 시각화: `git log --graph --oneline --all`
-- ours 전략 머지: `git merge 브랜치명 --strategy=ours`
-- 강제 push: `git push -f origin 브랜치명`
-- 원격 브랜치 받아오기: 
-  - `git fetch origin` 후 `git checkout -b 브랜치명 origin/브랜치명`
-  - 혹은 `git checkout -b 브랜치명` → `git pull origin 브랜치명`
+- **git rebase -i HEAD~N**: 커밋 편집
+  - `pick`: 유지
+  - `reword`: 메시지 수정
+  - `edit`: 내용 수정
+  - `squash`: 앞 커밋과 합치기 (메시지 포함)
+  - `fixup`: 메시지 생략하고 합치기
+  - `drop`: 삭제
+
+## Squash Merge
+
+- 여러 커밋을 하나로 합친 후 병합:
+  ```bash
+  git merge --squash <branch>
+  ```
+
+## Cherry-pick
+
+- 다른 브랜치의 커밋 복사:
+  ```bash
+  git cherry-pick <commit1> <commit2> ...
+  ```
+
+## 추적 브랜치 설정
+
+1. `git checkout -b <local> origin/<remote>`
+2. `git branch --set-upstream-to=origin/<remote> <local>`
+3. `git branch -u origin/<remote> <local>`
+4. `git push -u origin <local>:<remote>`
